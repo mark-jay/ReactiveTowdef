@@ -36,6 +36,11 @@ secPerTick = 0.05
 maxFrameTime :: Fractional a => a
 maxFrameTime = 0.05
 
+orthoW, orthoH :: GLdouble
+(orthoW, orthoH) = (1000, 1000)
+
+initWindowSize = Size 800 600
+
 -- entry point
 --------------
 
@@ -44,7 +49,7 @@ gameLoop coroutine = do
   getArgsAndInitialize >> createWindow "Game"
   state <- GS.initGlobState coroutine
 
-  let redraw = renderViewport (postRedisplay Nothing) state
+  let redraw = renderViewport (swapBuffers >> postRedisplay Nothing) state
       kbmouseCallback k ks mods pos =
         Input.updateKeyboardMouse (GS.getKB state) k ks mods pos >> redraw
       mouseMotionCallback pos = Input.updatePos (GS.getKB state) pos >> redraw
@@ -58,11 +63,11 @@ gameLoop coroutine = do
   -- Set up an orthogonal projection for 2D rendering
   matrixMode $= Projection
   loadIdentity
-  ortho 0 800 600 0 (-1) 1
+  ortho 0 orthoW orthoH 0 (-1) 1
   matrixMode $= Modelview 0
   loadIdentity
 
-  initialWindowSize  $= Size 800 600
+  initialWindowSize  $= initWindowSize
   initialDisplayMode $= [DoubleBuffered] -- now display callback will be called more often
   mainLoop
 
