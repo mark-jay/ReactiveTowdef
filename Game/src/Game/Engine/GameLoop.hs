@@ -49,11 +49,21 @@ gameLoop coroutine = do
         Input.updateKeyboardMouse (GS.getKB state) k ks mods pos >> redraw
       mouseMotionCallback pos = Input.updatePos (GS.getKB state) pos >> redraw
 
+  -- callbacks
   keyboardMouseCallback  $= Just kbmouseCallback
   motionCallback         $= Just mouseMotionCallback
   passiveMotionCallback  $= Just mouseMotionCallback
   displayCallback        $= redraw
 
+  -- Set up an orthogonal projection for 2D rendering
+  matrixMode $= Projection
+  loadIdentity
+  ortho 0 800 600 0 (-1) 1
+  matrixMode $= Modelview 0
+  loadIdentity
+
+  initialWindowSize  $= Size 800 600
+  initialDisplayMode $= [DoubleBuffered] -- now display callback will be called more often
   mainLoop
 
 -- rendering
@@ -77,4 +87,5 @@ renderViewport redisplayFn state = do
             Nothing -> do
                 exitWith ExitSuccess
 
-  return ()
+  swapBuffers
+  postRedisplay Nothing
