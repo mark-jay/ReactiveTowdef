@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 --
--- Module      :  Game.Engine.Keyboard
+-- Module      :  Game.Engine.Input
 -- Copyright   :
 -- License     :  AllRightsReserved
 --
@@ -13,11 +13,11 @@
 -----------------------------------------------------------------------------
 
 module Game.Engine.Input
-    ( Keyboard
-    , initKeyboard
+    ( Input
+    , initInput
     , isKeyDown
     , getMousePos
-    , updateKeyboard
+    , updateKeyboardMouse
     , updatePos
     , Key(..)
     ) where
@@ -32,53 +32,53 @@ import Data.IORef
 -------------------------
 
 -- | Set of all keys that are currently held down
-data Keyboard = Keyboard {
+data Input = Input {
     getKeys  :: (Set Key)
   , getMods  :: GLUT.Modifiers
   , getPos   :: GLUT.Position
   }
 
--- | Create a new Keyboard
-initKeyboard :: Keyboard
-initKeyboard = Keyboard Set.empty mods (GLUT.Position 0 0)
+-- | Create a new Input
+initInput :: Input
+initInput = Input Set.empty mods (GLUT.Position 0 0)
   where mods = GLUT.Modifiers Down Down Down
 
-mapKeys f (Keyboard keys mods pos) = (Keyboard (f keys) mods pos)
-mapMods f (Keyboard keys mods pos) = (Keyboard keys (f mods) pos)
-mapPos  f (Keyboard keys mods pos) = (Keyboard keys mods (f pos))
+mapKeys f (Input keys mods pos) = (Input (f keys) mods pos)
+mapMods f (Input keys mods pos) = (Input keys (f mods) pos)
+mapPos  f (Input keys mods pos) = (Input keys mods (f pos))
 
--- keyboard processing
+-- Input processing
 ----------------------
 
--- | Record a key state change in the given Keyboard
-handleKeyEvent :: Key -> KeyState -> GLUT.Modifiers -> Keyboard -> Keyboard
+-- | Record a key state change in the given Input
+handleKeyEvent :: Key -> KeyState -> GLUT.Modifiers -> Input -> Input
 handleKeyEvent k Down mods = setMods mods . addKey k
 handleKeyEvent k Up   mods = setMods mods . removeKey k
 
-setMods :: GLUT.Modifiers -> Keyboard -> Keyboard
+setMods :: GLUT.Modifiers -> Input -> Input
 setMods newMods = mapMods (const newMods)
 
-addKey :: Key -> Keyboard -> Keyboard
+addKey :: Key -> Input -> Input
 addKey k = mapKeys (Set.insert k)
 
-removeKey :: Key -> Keyboard -> Keyboard
+removeKey :: Key -> Input -> Input
 removeKey k = mapKeys (Set.delete k)
 
--- | Test if a key is currently held down in the given Keyboard
-isKeyDown :: Keyboard -> Key -> Bool
+-- | Test if a key is currently held down in the given Input
+isKeyDown :: Input -> Key -> Bool
 isKeyDown kb k = Set.member k $ getKeys kb
 
 -- | Returns position of the mouse
-getMousePos :: Keyboard -> GLUT.Position
+getMousePos :: Input -> GLUT.Position
 getMousePos = getPos
 
 -- IO stuff
 -----------
 
--- | Update the Keyboard state according to the event
-updateKeyboard :: IORef Keyboard -> GLUT.KeyboardMouseCallback
-updateKeyboard kb key keyState mods _ =
+-- | Update the Input state according to the event
+updateKeyboardMouse :: IORef Input -> GLUT.KeyboardMouseCallback
+updateKeyboardMouse kb key keyState mods _ =
    modifyIORef kb (handleKeyEvent key keyState mods)
 
-updatePos :: IORef Keyboard -> GLUT.MotionCallback
+updatePos :: IORef Input -> GLUT.MotionCallback
 updatePos kbRef pos = modifyIORef kbRef (mapPos (const pos))

@@ -46,7 +46,7 @@ gameLoop coroutine = do
 
   let redraw = renderViewport (postRedisplay Nothing) state
       kbmouseCallback k ks mods pos =
-        Input.updateKeyboard (GS.getKB state) k ks mods pos >> redraw
+        Input.updateKeyboardMouse (GS.getKB state) k ks mods pos >> redraw
       mouseMotionCallback pos = Input.updatePos (GS.getKB state) pos >> redraw
 
   keyboardMouseCallback  $= Just kbmouseCallback
