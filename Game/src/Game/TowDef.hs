@@ -28,6 +28,7 @@ import Prelude hiding ( log )
 
 import Control.Coroutine
 import qualified Control.Coroutine.FRP as FRP
+import Control.Coroutine.FRP ((<++>))
 
 import qualified Game.Engine as E
 import qualified Game.TowDef.Drawings as Drawings
@@ -42,7 +43,7 @@ log = hPutStrLn stderr
 --------
 
 mainCor :: E.MainCoroutine
-mainCor = main1
+mainCor = main1 <++> bindings
 
 main2 :: E.MainCoroutine
 main2 = Coroutine c
@@ -93,8 +94,9 @@ drawVertex (x, y) = vertex $ Vertex3 x y 0
 -- key bindings utils
 ---------------------
 
-setHotkey :: E.Key -> [E.Mod] -> IO () -> Coroutine E.Input [IO ()]
-setHotkey key mods action =
+setHotkey :: E.Key -> [E.Mod] -> IO ()
+          -> Coroutine (E.Input, POSIXTime) [IO ()]
+setHotkey key mods action = arr fst >>>
   FRP.withPrevious' >>> FRP.watch pressed >>> FRP.constE action
     where
       pressed :: ( E.Input, E.Input ) -> Bool
@@ -102,4 +104,4 @@ setHotkey key mods action =
          E.isKeyDown new key &&
          not ( E.isKeyDown old key ) && E.checkMods new mods
 
-temp = setHotkey (SpecialKey KeyF4) [] (exitWith ExitSuccess)
+bindings = setHotkey (SpecialKey KeyF4) [E.Alt] (exitWith ExitSuccess)
