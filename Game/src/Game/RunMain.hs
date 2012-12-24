@@ -17,7 +17,7 @@ module Game.RunMain (
 ) where
 
 import Graphics.Rendering.OpenGL
-import Graphics.UI.GLUT
+import Graphics.UI.GLUT as GLUT
 import Data.IORef
 import qualified Data.Maybe as Maybe
 import Control.Arrow
@@ -44,9 +44,14 @@ main :: IO ()
 main = gameLoop $ Coroutine c
   where
     c (input, time) = (action input, Just $ Coroutine c)
+    lowPos (GLUT.Position x y) = y > 500
     action input | Input.isKeyDown input (Input.SpecialKey KeyF1) = do
       clear [ColorBuffer]
       drawLines $ hypercubeToLines $ mkHypercube 4 6
+      flush
+    action input | lowPos (Input.getMousePos input) = do
+      clear [ColorBuffer]
+      drawLines $ hypercubeToLines $ mkHypercube 6 8
       flush
     action _ = do
       clear [ColorBuffer]
