@@ -88,7 +88,8 @@ renderViewport redisplayFn state = do
             Just c' -> do
                 writeIORef (GS.getCoroutine state) c'
                 writeIORef (GS.getPrevCall state) current
-                r'
+                sequence r'
+                return ()
             Nothing -> do
                 exitWith ExitSuccess
 

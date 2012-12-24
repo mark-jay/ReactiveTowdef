@@ -25,7 +25,7 @@ import Data.Time.Clock.POSIX
 import Control.Coroutine
 import qualified Game.Engine.Input as Input
 
-type MainCoroutine = Coroutine (Input.Input, POSIXTime) (IO ())
+type MainCoroutine = Coroutine (Input.Input, POSIXTime) [IO ()]
 
 data GlobState = GlobState {
     getKB        :: IORef Input.Input

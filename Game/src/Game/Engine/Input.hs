@@ -20,6 +20,8 @@ module Game.Engine.Input
     , updateKeyboardMouse
     , updatePos
     , Key(..)
+    , Mod(..)
+    , checkMods
     ) where
 
 import Data.Set (Set)
@@ -55,9 +57,6 @@ handleKeyEvent :: Key -> KeyState -> GLUT.Modifiers -> Input -> Input
 handleKeyEvent k Down mods = setMods mods . addKey k
 handleKeyEvent k Up   mods = setMods mods . removeKey k
 
-setMods :: GLUT.Modifiers -> Input -> Input
-setMods newMods = mapMods (const newMods)
-
 addKey :: Key -> Input -> Input
 addKey k = mapKeys (Set.insert k)
 
@@ -71,6 +70,22 @@ isKeyDown kb k = Set.member k $ getKeys kb
 -- | Returns position of the mouse
 getMousePos :: Input -> GLUT.Position
 getMousePos = getPos
+
+-- modifiers
+------------
+
+setMods :: GLUT.Modifiers -> Input -> Input
+setMods newMods = mapMods (const newMods)
+
+data Mod = Alt | Shift | Ctrl
+
+checkMod :: Mod -> Input -> Bool
+checkMod Alt   = (== Down) . GLUT.alt   . getMods
+checkMod Shift = (== Down) . GLUT.shift . getMods
+checkMod Ctrl  = (== Down) . GLUT.ctrl  . getMods
+
+checkMods :: Input -> [Mod] -> Bool
+checkMods input = all $ flip checkMod input
 
 -- IO stuff
 -----------

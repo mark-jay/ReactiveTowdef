@@ -27,8 +27,9 @@ import Data.Time.Clock.POSIX
 import Prelude hiding ( log )
 
 import Control.Coroutine
+import qualified Control.Coroutine.FRP as FRP
 
-import qualified Game.Engine as Engine
+import qualified Game.Engine as E
 import qualified Game.TowDef.Drawings as Drawings
 
 -- logging
@@ -40,30 +41,30 @@ log = hPutStrLn stderr
 -- tests
 --------
 
-mainCor :: Engine.MainCoroutine
+mainCor :: E.MainCoroutine
 mainCor = main1
 
-main2 :: Engine.MainCoroutine
+main2 :: E.MainCoroutine
 main2 = Coroutine c
   where
-    c (input, time) = (action input, Just $ Coroutine c)
+    c (input, time) = ([action input], Just $ Coroutine c)
     action input = do
       clear [ColorBuffer]
       let a = 400
       drawLines $ [((a, 100), (a, 500), Color3 1 0 0)]
       flush
 
-main1 :: Engine.MainCoroutine
+main1 :: E.MainCoroutine
 main1 = Coroutine c
   where
-    c (input, time) = (action input, Just $ Coroutine c)
+    c (input, time) = ([action input], Just $ Coroutine c)
     lowPos (GLUT.Position x y) = y > 500
     a = 400
-    action input | Engine.isKeyDown input (Engine.SpecialKey KeyF1) = do
+    action input | E.isKeyDown input (E.SpecialKey KeyF1) = do
       clear [ColorBuffer]
       drawLines $ [((a, 100), (a, 500), Color3 1 0 0)]
       flush
-    action input | lowPos (Engine.getMousePos input) = do
+    action input | lowPos (E.getMousePos input) = do
       clear [ColorBuffer]
       drawLines $ [((a, 200), (a, 400), Color3 1 0 0)]
       flush
@@ -89,3 +90,16 @@ drawLine (p1, p2, aColor) =  renderPrimitive Lines actions
 drawVertex :: Point -> IO ()
 drawVertex (x, y) = vertex $ Vertex3 x y 0
 
+-- key bindings utils
+---------------------
+
+setHotkey :: E.Key -> [E.Mod] -> IO () -> Coroutine E.Input [IO ()]
+setHotkey key mods action =
+  FRP.withPrevious' >>> FRP.watch pressed >>> FRP.constE action
+    where
+      pressed :: ( E.Input, E.Input ) -> Bool
+      pressed ( new, old ) =
+         E.isKeyDown new key &&
+         not ( E.isKeyDown old key ) && E.checkMods new mods
+
+temp = setHotkey (SpecialKey KeyF4) [] (exitWith ExitSuccess)
