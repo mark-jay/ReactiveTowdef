@@ -24,7 +24,7 @@ import Data.IORef
 
 import Control.Coroutine
 
-import qualified Game.Engine.Keyboard as KB
+import qualified Game.Engine.Input as Input
 import qualified Game.Engine.GlobState as GS
 
 -- consts
@@ -46,8 +46,8 @@ gameLoop coroutine = do
 
   let redraw = renderViewport (postRedisplay Nothing) state
       kbmouseCallback k ks mods pos =
-        KB.updateKeyboard (GS.getKB state) k ks mods pos >> redraw
-      mouseMotionCallback = KB.updatePos (GS.getKB state)
+        Input.updateKeyboard (GS.getKB state) k ks mods pos >> redraw
+      mouseMotionCallback pos = Input.updatePos (GS.getKB state) pos >> redraw
 
   keyboardMouseCallback  $= Just kbmouseCallback
   motionCallback         $= Just mouseMotionCallback

@@ -28,7 +28,7 @@ import Prelude hiding ( log )
 import Control.Coroutine
 
 import Game.Engine.GameLoop ( gameLoop )
-import qualified Game.Engine.Keyboard as KB
+import qualified Game.Engine.Input as Input
 import qualified Game.Engine.GlobState as GS
 
 -- logging
@@ -43,8 +43,8 @@ log = hPutStrLn stderr
 main :: IO ()
 main = gameLoop $ Coroutine c
   where
-    c (kb, time) = (action kb, Just $ Coroutine c)
-    action kb | KB.isKeyDown kb (KB.SpecialKey KeyF1) = do
+    c (input, time) = (action input, Just $ Coroutine c)
+    action input | Input.isKeyDown input (Input.SpecialKey KeyF1) = do
       clear [ColorBuffer]
       drawLines $ hypercubeToLines $ mkHypercube 4 6
       flush

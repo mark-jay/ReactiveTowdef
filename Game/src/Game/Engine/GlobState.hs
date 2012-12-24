@@ -23,7 +23,7 @@ import Data.IORef
 import Data.Time.Clock.POSIX
 
 import Control.Coroutine
-import qualified Game.Engine.Keyboard as KB
+import qualified Game.Engine.Input as KB
 
 type MainCoroutine = Coroutine (KB.Keyboard, POSIXTime) (IO ())
 

@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Game.Engine.Keyboard
+module Game.Engine.Input
     ( Keyboard
     , initKeyboard
     , isKeyDown

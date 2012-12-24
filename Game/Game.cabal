@@ -14,6 +14,6 @@ executable Game
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
-    other-modules: Game.RunMain Game.Engine.Keyboard
+    other-modules: Game.RunMain Game.Engine.Input
                    Game.Engine.GlobState Game.Engine.GameLoop
  
