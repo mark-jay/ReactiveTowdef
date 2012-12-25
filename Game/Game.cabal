@@ -13,7 +13,7 @@ executable Game
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
-    other-modules: Game.TowDef.Drawings Game.TowDef Game.Engine
-                   Game.RunMain Game.Engine.Input Game.Engine.GlobState
+    other-modules: Game.Engine.Utils Game.TowDef.Drawings Game.TowDef
+                   Game.Engine Game.RunMain Game.Engine.Input Game.Engine.GlobState
                    Game.Engine.GameLoop
  

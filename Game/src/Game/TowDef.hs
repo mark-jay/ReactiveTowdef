@@ -45,34 +45,15 @@ log = hPutStrLn stderr
 mainCor :: E.MainCoroutine
 mainCor = main1 <++> bindings
 
-main2 :: E.MainCoroutine
-main2 = Coroutine c
-  where
-    c (input, time) = ([action input], Just $ Coroutine c)
-    action input = do
-      clear [ColorBuffer]
-      let a = 400
-      drawLines $ [((a, 100), (a, 500), Color3 1 0 0)]
-      flush
+bindings :: E.MainCoroutine
+bindings = E.setHotkey (SpecialKey KeyF4) [E.Alt] (exitWith ExitSuccess)
 
 main1 :: E.MainCoroutine
-main1 = Coroutine c
-  where
-    c (input, time) = ([action input], Just $ Coroutine c)
-    lowPos (GLUT.Position x y) = y > 500
-    a = 400
-    action input | E.isKeyDown input (E.SpecialKey KeyF1) = do
+main1 = arr $ const [do
       clear [ColorBuffer]
-      drawLines $ [((a, 100), (a, 500), Color3 1 0 0)]
-      flush
-    action input | lowPos (E.getMousePos input) = do
-      clear [ColorBuffer]
-      drawLines $ [((a, 200), (a, 400), Color3 1 0 0)]
-      flush
-    action _ = do
-      clear [ColorBuffer]
-      drawLines $ [((a, 250), (a, 350), Color3 1 0 0)]
-      flush
+      let a = 500
+      drawLines $ [((a, 100), (a, 900), Color3 1 0 0)]
+      flush]
 
 -- plotting to the window
 -------------------------
@@ -90,18 +71,3 @@ drawLine (p1, p2, aColor) =  renderPrimitive Lines actions
 
 drawVertex :: Point -> IO ()
 drawVertex (x, y) = vertex $ Vertex3 x y 0
-
--- key bindings utils
----------------------
-
-setHotkey :: E.Key -> [E.Mod] -> IO ()
-          -> Coroutine (E.Input, POSIXTime) [IO ()]
-setHotkey key mods action = arr fst >>>
-  FRP.withPrevious' >>> FRP.watch pressed >>> FRP.constE action
-    where
-      pressed :: ( E.Input, E.Input ) -> Bool
-      pressed ( new, old ) =
-         E.isKeyDown new key &&
-         not ( E.isKeyDown old key ) && E.checkMods new mods
-
-bindings = setHotkey (SpecialKey KeyF4) [E.Alt] (exitWith ExitSuccess)
