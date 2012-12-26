@@ -36,23 +36,23 @@ import qualified Game.Engine as E
 import Data.Array.Storable
 import Codec.Image.PNG
 
-import Game.TowDef.Drawings ( drawRect )
+import Game.TowDef.Drawings ( drawRect, RectD(..) )
 
 -- tests
 --------
 
 mainCor :: E.MainCoroutineIO
-mainCor = main1 <++> bindings
+mainCor = E.mainCoroutineToIO main1 <++> bindings
 
 bindings :: E.MainCoroutineIO
 bindings = E.setHotkey (SpecialKey KeyF4) [E.Alt] (exitWith ExitSuccess)
       <++> E.setHotkey (Char '\27') [] (exitWith ExitSuccess)
 
-main1 :: E.MainCoroutineIO
-main1 = arr $ (\(inp, _) -> [do
+main1 :: E.MainCoroutine RectD
+main1 = arr $ (\(inp, _) -> [
       let (Position x y) = fromMaybe (Position 0 0) $ E.getMousePos' inp
           v = fromIntegral (x `rem` 1000) / 1000.0
-      drawRect ( 100, 100 ) ( 500, 500 ) ( Color3 v 0 0 )
+      in RectD ( 100, 100 ) ( 500, 500 ) ( Color3 v 0 0 )
       ])
 
 -- drawing textures

@@ -13,10 +13,11 @@
 -----------------------------------------------------------------------------
 
 module Game.TowDef.Drawings (
-  drawRect
+    drawRect
+  , RectD(..)
 ) where
 
-import Graphics.Rendering.OpenGL hiding ( Rect )
+import Graphics.Rendering.OpenGL
 
 import Game.Engine.Data
 
@@ -40,10 +41,10 @@ drawVertex (x, y) = vertex $ Vertex3 x y 0
 -- rect
 -------
 
-data Rect = Rect Point Point ColorT
+data RectD = RectD Point Point ColorT
 
-instance Drawable Rect where
-  draw (Rect (x1, y1) (x2, y2) aColor) = renderPrimitive Quads actions
+instance Drawable RectD where
+  draw (RectD (x1, y1) (x2, y2) aColor) = renderPrimitive Quads actions
     where actions = color aColor >>
                     drawVertex (x1, y1) >> drawVertex (x2, y1) >>
                     drawVertex (x2, y2) >> drawVertex (x1, y2)

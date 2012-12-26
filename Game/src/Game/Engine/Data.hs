@@ -19,6 +19,8 @@ module Game.Engine.Data (
   , mainCoroutineToIO
 ) where
 
+import Control.Monad ( mapM_ )
+
 import Control.Coroutine
 import qualified Game.Engine.Input as Input
 import Data.Time.Clock.POSIX
@@ -31,6 +33,9 @@ class Drawable d where
 
 instance Drawable (IO a) where
     draw = (>> return ())
+
+instance Drawable a => Drawable [a] where
+    draw = mapM_ draw
 
 -- MainCoroutine
 ----------------
