@@ -20,6 +20,7 @@ module Game.TowDef (
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT as GLUT
 import Data.IORef
+import Data.Maybe ( fromMaybe )
 import qualified Data.Maybe as Maybe
 import Control.Arrow
 import System.Exit as System
@@ -54,8 +55,8 @@ bindings = E.setHotkey (SpecialKey KeyF4) [E.Alt] (exitWith ExitSuccess)
 
 main1 :: E.MainCoroutine
 main1 = arr $ (\(inp, _) -> [do
-      let (Position x y) = E.getMousePos inp
-          v = fromIntegral (x `rem` 255) / 255.0
+      let (Position x y) = fromMaybe (Position 0 0) $ E.getMousePos' inp
+          v = fromIntegral (x `rem` 1000) / 1000.0
       drawRect ( 100, 100 ) ( 500, 500 ) ( Color3 v 0 0 )
       ])
 

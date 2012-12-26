@@ -55,12 +55,14 @@ gameLoop coroutine = do
         Input.updateKeyboardMouse inpRef k ks mods pos >> redraw
       mouseMotionCallback pos = Input.updatePos inpRef pos >> redraw
       mouseCrossing crossing = Input.updateCrossing inpRef crossing >> redraw
+      shapeCallback size = Input.updateShape inpRef size >> redraw
 
   -- callbacks
   keyboardMouseCallback  $= Just kbmouseCallback
   motionCallback         $= Just mouseMotionCallback
   passiveMotionCallback  $= Just mouseMotionCallback
   crossingCallback       $= Just mouseCrossing
+  reshapeCallback        $= Just shapeCallback
   displayCallback        $= redraw
 
   -- Set up an orthogonal projection for 2D rendering

@@ -17,9 +17,11 @@ module Game.Engine.Input
     , initInput
     , isKeyDown
     , getMousePos
+    , getMousePos'
     , updateKeyboardMouse
     , updateCrossing
     , updatePos
+    , updateShape
     , Key(..)
     , Mod(..)
     , checkMods
@@ -34,18 +36,18 @@ import Data.IORef
 -- WinInfo datatype
 -------------------
 
-type Size = (Int, Int)
-type WPosition = (Int, Int)
-type MouseEntered = Bool
-
-data WinInfo = WinInfo Size WPosition MouseEntered
+data WinInfo = WinInfo {
+    getSize     :: GLUT.Size
+  , getWPos     :: GLUT.Position
+  , getCrossing :: GLUT.Crossing
+  } deriving ( Show )
 
 initWinInfo :: WinInfo
-initWinInfo = WinInfo ( 0, 0 ) ( 0, 0 ) False
+initWinInfo = WinInfo ( GLUT.Size 0 0 ) ( GLUT.Position 0 0 ) GLUT.WindowLeft
 
-mapSize   f (WinInfo size wpos mEntrd) = (WinInfo ( f size ) wpos mEntrd )
-mapWPos   f (WinInfo size wpos mEntrd) = (WinInfo size ( f wpos ) mEntrd )
-mapMEntrd f (WinInfo size wpos mEntrd) = (WinInfo size wpos ( f mEntrd ) )
+mapSize   f (WinInfo size wpos mEntrd) = ( WinInfo ( f size ) wpos mEntrd )
+mapWPos   f (WinInfo size wpos mEntrd) = ( WinInfo size ( f wpos ) mEntrd )
+mapMEntrd f (WinInfo size wpos mEntrd) = ( WinInfo size wpos ( f mEntrd ) )
 
 -- Input datatype
 -----------------
@@ -56,7 +58,7 @@ data Input = Input {
   , getMods    :: GLUT.Modifiers
   , getPos     :: GLUT.Position
   , getWinInfo :: WinInfo
-  }
+  } deriving ( Show )
 
 -- | Create a new Input
 initInput :: Input
@@ -91,8 +93,15 @@ getMousePos :: Input -> GLUT.Position
 getMousePos = getPos
 
 -- | Returns position of the mouse scaled from 0 to 1000 by x and y
-getMousePos' :: Input -> GLUT.Position
-getMousePos' inp = getMousePos inp
+getMousePos' :: Input -> Maybe GLUT.Position
+getMousePos' inp | isInside inp = Just . scaleCoords . getPos $ inp
+                 | otherwise    = Nothing
+  where
+    isInside    = (== GLUT.WindowEntered) . getCrossing . getWinInfo
+    scaleCoords ( GLUT.Position x y ) = GLUT.Position ( f x w ) ( f y h )
+    f :: GLUT.GLint -> GLUT.GLsizei -> GLUT.GLint
+    f x y = round ( (fromIntegral x / fromIntegral y) * 1000 )
+    GLUT.Size w h = getSize $ getWinInfo inp
 
 -- modifiers
 ------------
@@ -118,8 +127,16 @@ updateKeyboardMouse :: IORef Input -> GLUT.KeyboardMouseCallback
 updateKeyboardMouse kb key keyState mods _ =
    modifyIORef kb (handleKeyEvent key keyState mods)
 
+-- | Update the Input state according to the event
 updatePos :: IORef Input -> GLUT.MotionCallback
-updatePos kbRef pos = modifyIORef kbRef (mapPos (const pos))
+updatePos inpRef pos = modifyIORef inpRef (mapPos (const pos))
 
+-- | Update the Input state according to the event
 updateCrossing :: IORef Input -> GLUT.CrossingCallback
-updateCrossing = undefined
+updateCrossing inpRef crossing =
+  modifyIORef inpRef . mapWInfo . mapMEntrd . const $ crossing
+
+-- | Update the Input state according to the event
+updateShape :: IORef Input -> GLUT.ReshapeCallback
+updateShape inpRef size =
+  modifyIORef inpRef . mapWInfo . mapSize . const $ size
