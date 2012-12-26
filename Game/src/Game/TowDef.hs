@@ -37,23 +37,18 @@ import Data.Array.Storable
 import Codec.Image.PNG
 
 import Game.TowDef.Drawings ( drawRect )
--- logging
-import System.IO
-
-log :: String -> IO ()
-log = hPutStrLn stderr
 
 -- tests
 --------
 
-mainCor :: E.MainCoroutine
+mainCor :: E.MainCoroutineIO
 mainCor = main1 <++> bindings
 
-bindings :: E.MainCoroutine
+bindings :: E.MainCoroutineIO
 bindings = E.setHotkey (SpecialKey KeyF4) [E.Alt] (exitWith ExitSuccess)
       <++> E.setHotkey (Char '\27') [] (exitWith ExitSuccess)
 
-main1 :: E.MainCoroutine
+main1 :: E.MainCoroutineIO
 main1 = arr $ (\(inp, _) -> [do
       let (Position x y) = fromMaybe (Position 0 0) $ E.getMousePos' inp
           v = fromIntegral (x `rem` 1000) / 1000.0

@@ -5,7 +5,6 @@ build-type: Simple
 license: AllRightsReserved
 license-file: ""
 synopsis: Game
-description:  
 data-dir: ""
  
 executable Game
@@ -14,7 +13,7 @@ executable Game
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
-    other-modules: Game.TowDef Game.RunMain Game.Engine
-                   Game.TowDef.Drawings Game.Engine.Utils Game.Engine.Input
-                   Game.Engine.GlobState Game.Engine.GameLoop
+    other-modules: Game.Engine.Data Game.TowDef Game.RunMain
+                   Game.Engine Game.TowDef.Drawings Game.Engine.Utils
+                   Game.Engine.Input Game.Engine.GlobState Game.Engine.GameLoop
  

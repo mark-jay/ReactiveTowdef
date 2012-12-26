@@ -16,7 +16,9 @@ module Game.TowDef.Drawings (
   drawRect
 ) where
 
-import Graphics.Rendering.OpenGL
+import Graphics.Rendering.OpenGL hiding ( Rect )
+
+import Game.Engine.Data
 
 -- plotting to the window
 -------------------------
@@ -34,6 +36,18 @@ drawLine (p1, p2, aColor) = renderPrimitive Lines actions
 
 drawVertex :: Point -> IO ()
 drawVertex (x, y) = vertex $ Vertex3 x y 0
+
+-- rect
+-------
+
+data Rect = Rect Point Point ColorT
+
+instance Drawable Rect where
+  draw (Rect (x1, y1) (x2, y2) aColor) = renderPrimitive Quads actions
+    where actions = color aColor >>
+                    drawVertex (x1, y1) >> drawVertex (x2, y1) >>
+                    drawVertex (x2, y2) >> drawVertex (x1, y2)
+
 
 drawRect :: Point -> Point -> ColorT -> IO ()
 drawRect (x1, y1) (x2, y2) aColor = renderPrimitive Quads actions

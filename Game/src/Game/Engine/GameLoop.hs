@@ -26,6 +26,7 @@ import Control.Coroutine
 
 import qualified Game.Engine.Input as Input
 import qualified Game.Engine.GlobState as GS
+import Game.Engine.Data ( MainCoroutine, Drawable, mainCoroutineToIO )
 
 -- consts
 ---------
@@ -44,10 +45,10 @@ initWindowSize = Size 800 600
 -- entry point
 --------------
 
-gameLoop :: GS.MainCoroutine -> IO ()
+gameLoop :: Drawable d => MainCoroutine d -> IO ()
 gameLoop coroutine = do
   getArgsAndInitialize >> createWindow "Game"
-  state <- GS.initGlobState coroutine
+  state <- GS.initGlobState (mainCoroutineToIO coroutine)
 
   let inpRef = GS.getKB state
       redraw = renderViewport (swapBuffers >> postRedisplay Nothing) state
