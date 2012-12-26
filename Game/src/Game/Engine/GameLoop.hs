@@ -81,17 +81,17 @@ renderViewport redisplayFn state = do
   let delta  = (current - prev)
 
   if delta < secPerTick
-      then redisplayFn
+      then return ()
       else do
         let (r', c') = runC c (kb, current)
         case c' of
             Just c' -> do
                 writeIORef (GS.getCoroutine state) c'
                 writeIORef (GS.getPrevCall state) current
+                clear [ColorBuffer]
                 sequence r'
-                return ()
+                flush
             Nothing -> do
                 exitWith ExitSuccess
 
-  swapBuffers
-  postRedisplay Nothing
+  redisplayFn
