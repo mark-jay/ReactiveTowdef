@@ -1,0 +1,1 @@
+to compile pngload package I have download the package with cabal unpack png-load, removed haskell-98 package from the dependencies and did cabal install

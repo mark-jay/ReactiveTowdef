@@ -5,15 +5,16 @@ build-type: Simple
 license: AllRightsReserved
 license-file: ""
 synopsis: Game
+description:  
 data-dir: ""
  
 executable Game
-    build-depends: GLUT -any, OpenGL -any, QuickCheck -any, base -any,
-                   containers -any, hslogger -any, time -any
+    build-depends: GLUT -any, OpenGL -any, QuickCheck -any, array -any,
+                   base -any, containers -any, hslogger -any, pngload -any, time -any
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
-    other-modules: Game.Engine.Utils Game.TowDef.Drawings Game.TowDef
-                   Game.Engine Game.RunMain Game.Engine.Input Game.Engine.GlobState
-                   Game.Engine.GameLoop
+    other-modules: Game.TowDef Game.RunMain Game.Engine
+                   Game.TowDef.Drawings Game.Engine.Utils Game.Engine.Input
+                   Game.Engine.GlobState Game.Engine.GameLoop
  
