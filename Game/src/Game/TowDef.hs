@@ -31,8 +31,11 @@ import qualified Control.Coroutine.FRP as FRP
 import Control.Coroutine.FRP ((<++>))
 
 import qualified Game.Engine as E
-import qualified Game.TowDef.Drawings as Drawings
 
+import Data.Array.Storable
+import Codec.Image.PNG
+
+import Game.TowDef.Drawings ( drawRect )
 -- logging
 import System.IO
 
@@ -47,27 +50,20 @@ mainCor = main1 <++> bindings
 
 bindings :: E.MainCoroutine
 bindings = E.setHotkey (SpecialKey KeyF4) [E.Alt] (exitWith ExitSuccess)
+      <++> E.setHotkey (Char '\27') [] (exitWith ExitSuccess)
 
 main1 :: E.MainCoroutine
-main1 = arr $ const [do
-      clear [ColorBuffer]
-      let a = 500
-      drawLines $ [((a, 100), (a, 900), Color3 1 0 0)]
-      flush]
+main1 = arr $ (\(inp, _) -> [do
+      let (Position x y) = E.getMousePos inp
+          v = fromIntegral (x `rem` 255) / 255.0
+      drawRect ( 100, 100 ) ( 500, 500 ) ( Color3 v 0 0 )
+      ])
 
--- plotting to the window
--------------------------
-type Line = (Point, Point, ColorT)
-type ColorT = Color3 GLfloat
-type Point = (Coord, Coord)
-type Coord = GLfloat
+-- drawing textures
+-------------------
 
-drawLines :: [Line] -> IO ()
-drawLines = mapM_ drawLine
+reminder = loadPNGFile "file" >>= f
+  where f (Left error)     = return ()
+        f (Right pngImage) = g $ imageData pngImage
+        g storArr = withStorableArray storArr (\ptr -> return ())
 
-drawLine :: Line -> IO ()
-drawLine (p1, p2, aColor) =  renderPrimitive Lines actions
-  where actions = color aColor >> drawVertex p1 >> drawVertex p2
-
-drawVertex :: Point -> IO ()
-drawVertex (x, y) = vertex $ Vertex3 x y 0

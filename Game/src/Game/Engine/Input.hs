@@ -18,6 +18,7 @@ module Game.Engine.Input
     , isKeyDown
     , getMousePos
     , updateKeyboardMouse
+    , updateCrossing
     , updatePos
     , Key(..)
     , Mod(..)
@@ -30,24 +31,42 @@ import Graphics.UI.GLUT (Key(..), KeyState(..))
 import qualified Graphics.UI.GLUT as GLUT
 import Data.IORef
 
--- datatype and basic api
--------------------------
+-- WinInfo datatype
+-------------------
+
+type Size = (Int, Int)
+type WPosition = (Int, Int)
+type MouseEntered = Bool
+
+data WinInfo = WinInfo Size WPosition MouseEntered
+
+initWinInfo :: WinInfo
+initWinInfo = WinInfo ( 0, 0 ) ( 0, 0 ) False
+
+mapSize   f (WinInfo size wpos mEntrd) = (WinInfo ( f size ) wpos mEntrd )
+mapWPos   f (WinInfo size wpos mEntrd) = (WinInfo size ( f wpos ) mEntrd )
+mapMEntrd f (WinInfo size wpos mEntrd) = (WinInfo size wpos ( f mEntrd ) )
+
+-- Input datatype
+-----------------
 
 -- | Set of all keys that are currently held down
 data Input = Input {
-    getKeys  :: (Set Key)
-  , getMods  :: GLUT.Modifiers
-  , getPos   :: GLUT.Position
+    getKeys    :: (Set Key)
+  , getMods    :: GLUT.Modifiers
+  , getPos     :: GLUT.Position
+  , getWinInfo :: WinInfo
   }
 
 -- | Create a new Input
 initInput :: Input
-initInput = Input Set.empty mods (GLUT.Position 0 0)
+initInput = Input Set.empty mods (GLUT.Position 0 0) initWinInfo
   where mods = GLUT.Modifiers Down Down Down
 
-mapKeys f (Input keys mods pos) = (Input (f keys) mods pos)
-mapMods f (Input keys mods pos) = (Input keys (f mods) pos)
-mapPos  f (Input keys mods pos) = (Input keys mods (f pos))
+mapKeys  f (Input keys mods pos wInfo) = (Input (f keys) mods pos wInfo)
+mapMods  f (Input keys mods pos wInfo) = (Input keys (f mods) pos wInfo)
+mapPos   f (Input keys mods pos wInfo) = (Input keys mods (f pos) wInfo)
+mapWInfo f (Input keys mods pos wInfo) = (Input keys mods pos (f wInfo))
 
 -- Input processing
 ----------------------
@@ -70,6 +89,10 @@ isKeyDown kb k = Set.member k $ getKeys kb
 -- | Returns position of the mouse
 getMousePos :: Input -> GLUT.Position
 getMousePos = getPos
+
+-- | Returns position of the mouse scaled from 0 to 1000 by x and y
+getMousePos' :: Input -> GLUT.Position
+getMousePos' inp = getMousePos inp
 
 -- modifiers
 ------------
@@ -97,3 +120,6 @@ updateKeyboardMouse kb key keyState mods _ =
 
 updatePos :: IORef Input -> GLUT.MotionCallback
 updatePos kbRef pos = modifyIORef kbRef (mapPos (const pos))
+
+updateCrossing :: IORef Input -> GLUT.CrossingCallback
+updateCrossing = undefined

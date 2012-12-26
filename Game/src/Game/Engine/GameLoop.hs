@@ -49,15 +49,18 @@ gameLoop coroutine = do
   getArgsAndInitialize >> createWindow "Game"
   state <- GS.initGlobState coroutine
 
-  let redraw = renderViewport (swapBuffers >> postRedisplay Nothing) state
+  let inpRef = GS.getKB state
+      redraw = renderViewport (swapBuffers >> postRedisplay Nothing) state
       kbmouseCallback k ks mods pos =
-        Input.updateKeyboardMouse (GS.getKB state) k ks mods pos >> redraw
-      mouseMotionCallback pos = Input.updatePos (GS.getKB state) pos >> redraw
+        Input.updateKeyboardMouse inpRef k ks mods pos >> redraw
+      mouseMotionCallback pos = Input.updatePos inpRef pos >> redraw
+      mouseCrossing crossing = Input.updateCrossing inpRef crossing >> redraw
 
   -- callbacks
   keyboardMouseCallback  $= Just kbmouseCallback
   motionCallback         $= Just mouseMotionCallback
   passiveMotionCallback  $= Just mouseMotionCallback
+  crossingCallback       $= Just mouseCrossing
   displayCallback        $= redraw
 
   -- Set up an orthogonal projection for 2D rendering
