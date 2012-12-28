@@ -26,22 +26,28 @@ import Control.Coroutine
 import qualified Game.Engine.Input as Input
 import Game.Engine.Data ( MainCoroutineIO )
 
+import qualified Graphics.UI.GLUT as GLUT
+import Game.Engine.Textures ( getAndCreateTexturesAll, Textures )
+
 data GlobState = GlobState {
     getKB        :: IORef Input.Input
   , getPrevCall  :: IORef POSIXTime
   , getCoroutine :: IORef MainCoroutineIO
+  , getTextures  :: Textures
   }
 
-unpack :: GlobState -> IO (Input.Input, POSIXTime, MainCoroutineIO)
+unpack :: GlobState -> IO (Input.Input, POSIXTime, MainCoroutineIO, Textures)
 unpack state = do
-  kb  <- readIORef (getKB state)
-  pc  <- readIORef (getPrevCall state)
-  cor <- readIORef (getCoroutine state)
-  return (kb, pc, cor)
+  kb   <- readIORef $ getKB state
+  pc   <- readIORef $ getPrevCall state
+  cor  <- readIORef $ getCoroutine state
+  let texs = getTextures state
+  return (kb, pc, cor, texs)
 
 initGlobState :: MainCoroutineIO -> IO GlobState
 initGlobState coroutine = do
   kbRef        <- newIORef Input.initInput
   prevCallRef  <- getPOSIXTime >>= newIORef
   coroutineRef <- newIORef coroutine
-  return $ GlobState kbRef prevCallRef coroutineRef
+  textures     <- getAndCreateTexturesAll "png"
+  return $ GlobState kbRef prevCallRef coroutineRef textures

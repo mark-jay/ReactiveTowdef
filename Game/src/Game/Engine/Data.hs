@@ -19,11 +19,15 @@ module Game.Engine.Data (
   , mainCoroutineToIO
 ) where
 
+import Graphics.UI.GLUT ( TextureObject )
+
 import Control.Monad ( mapM_ )
 
 import Control.Coroutine
 import qualified Game.Engine.Input as Input
 import Data.Time.Clock.POSIX
+
+import Game.Engine.Textures ( Textures )
 
 -- Drawable
 -----------
@@ -40,8 +44,9 @@ instance Drawable a => Drawable [a] where
 -- MainCoroutine
 ----------------
 
-type MainCoroutine d = Coroutine (Input.Input, POSIXTime) [d]
+type MainCoroutine d = Coroutine (Input.Input, POSIXTime, Textures) [d]
 type MainCoroutineIO = MainCoroutine (IO ())
 
 mainCoroutineToIO :: Drawable d => MainCoroutine d -> MainCoroutineIO
 mainCoroutineToIO = fmap (map draw)
+

@@ -54,10 +54,10 @@ mapMEntrd f (WinInfo size wpos mEntrd) = ( WinInfo size wpos ( f mEntrd ) )
 
 -- | Set of all keys that are currently held down
 data Input = Input {
-    getKeys    :: (Set Key)
-  , getMods    :: GLUT.Modifiers
-  , getPos     :: GLUT.Position
-  , getWinInfo :: WinInfo
+    getKeys     :: (Set Key)
+  , getMods     :: GLUT.Modifiers
+  , getPos      :: GLUT.Position
+  , getWinInfo  :: WinInfo
   } deriving ( Show )
 
 -- | Create a new Input

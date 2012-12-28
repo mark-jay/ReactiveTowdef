@@ -81,7 +81,7 @@ gameLoop coroutine = do
 ------------
 
 renderViewport redisplayFn state = do
-  (kb, prev, c) <- GS.unpack state
+  (kb, prev, c, textures) <- GS.unpack state
   current <- getPOSIXTime
 
   let delta  = (current - prev)
@@ -89,7 +89,7 @@ renderViewport redisplayFn state = do
   if delta < secPerTick
       then return ()
       else do
-        let (r', c') = runC c (kb, current)
+        let (r', c') = runC c (kb, current, textures)
         case c' of
             Just c' -> do
                 writeIORef (GS.getCoroutine state) c'
