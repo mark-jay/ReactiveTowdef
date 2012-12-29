@@ -66,13 +66,7 @@ gameLoop coroutine = do
   reshapeCallback        $= Just shapeCallback
   displayCallback        $= redraw
 
-  -- Set up an orthogonal projection for 2D rendering
-  matrixMode $= Projection
-  loadIdentity
-  let (l, r, b, t, n, f) = (0, orthoW, orthoH, 0, (-1), 1)
-  ortho l r b t n f -- the last two don't matter?
-  matrixMode $= Modelview 0
-  loadIdentity
+  squareReshape initWindowSize
 
   initialWindowSize  $= initWindowSize
   initialDisplayMode $= [DoubleBuffered] -- now display callback will be called more often
@@ -113,19 +107,20 @@ simpleReshape :: Size -> IO ()
 simpleReshape size = viewport $= ((Position 0 0), size)
 
 squareReshape :: Size -> IO ()
-squareReshape (Size w h) = do
-  viewport $= ((Position 0 0), (Size w h))
+squareReshape (Size w h) = setViewport >> setProjectionMatrix
+  where
+    setViewport = viewport $= ((Position 0 0), (Size w h))
+    setProjectionMatrix = do
+      let aspect = fromIntegral w / fromIntegral h
+          (l, r, b, t, n, f) = (0, orthoW, orthoH, 0, (-1), 1)
 
-  let aspect = fromIntegral w / fromIntegral h
-      (l, r, b, t, n, f) = (0, orthoW, orthoH, 0, (-1), 1)
-
-  -- Set up an orthogonal projection for 2D rendering
-  matrixMode $= Projection
-  loadIdentity
-  if aspect < 1.0
-    then ortho l r (b * (1 / aspect)) t n f -- the last two don't matter?
-    else ortho l (r * aspect) b t n f
-  matrixMode $= Modelview 0
-  loadIdentity
+      -- Set up an orthogonal projection for 2D rendering
+      matrixMode $= Projection
+      loadIdentity
+      if aspect < 1.0
+        then ortho l r (b * (1 / aspect)) t n f -- the last two don't matter?
+        else ortho l (r * aspect) b t n f
+      matrixMode $= Modelview 0
+      loadIdentity
 
 
