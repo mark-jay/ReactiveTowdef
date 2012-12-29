@@ -1,0 +1,1 @@
+understand squareReshape vs simpleReshape functions
