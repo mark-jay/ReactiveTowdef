@@ -53,6 +53,7 @@ instance E.Drawable RectD where
   draw (RectT (x1, y1) (x2, y2) texObj) = renderPrimitive Quads actions
     where actions = E.withTexture2d texObj $ do
              let texCoord2f = texCoord :: TexCoord2 GLfloat -> IO ()
+             color ( Color3 1 1 ( 1 :: GLfloat ) )
              texCoord2f (TexCoord2 0 0) >> drawVertex (x1, y1)
              texCoord2f (TexCoord2 0 1) >> drawVertex (x1, y2)
              texCoord2f (TexCoord2 1 1) >> drawVertex (x2, y2)
