@@ -56,7 +56,7 @@ gameLoop coroutine = do
         Input.updateKeyboardMouse inpRef k ks mods pos >> redraw
       mouseMotionCallback pos = Input.updatePos inpRef pos >> redraw
       mouseCrossing crossing = Input.updateCrossing inpRef crossing >> redraw
-      shapeCallback size = Input.updateShape inpRef size >> redraw
+      shapeCallback size = reshape size >> Input.updateShape inpRef size >> redraw
 
   -- callbacks
   keyboardMouseCallback  $= Just kbmouseCallback
@@ -69,7 +69,8 @@ gameLoop coroutine = do
   -- Set up an orthogonal projection for 2D rendering
   matrixMode $= Projection
   loadIdentity
-  ortho 0 orthoW orthoH 0 (-1) 1
+  let (l, r, b, t, n, f) = (0, orthoW, orthoH, 0, (-1), 1)
+  ortho l r b t n f -- the last two don't matter?
   matrixMode $= Modelview 0
   loadIdentity
 
@@ -101,3 +102,30 @@ renderViewport redisplayFn state = do
                 exitWith ExitSuccess
 
   redisplayFn
+
+-- reshape
+----------
+
+-- entry point callback
+reshape = simpleReshape
+
+simpleReshape :: Size -> IO ()
+simpleReshape size = viewport $= ((Position 0 0), size)
+
+squareReshape :: Size -> IO ()
+squareReshape (Size w h) = do
+  viewport $= ((Position 0 0), (Size w h))
+
+  let aspect = fromIntegral w / fromIntegral h
+      (l, r, b, t, n, f) = (0, orthoW, orthoH, 0, (-1), 1)
+
+  -- Set up an orthogonal projection for 2D rendering
+  matrixMode $= Projection
+  loadIdentity
+  if aspect < 1.0
+    then ortho l r (b * (1 / aspect)) t n f -- the last two don't matter?
+    else ortho l (r * aspect) b t n f
+  matrixMode $= Modelview 0
+  loadIdentity
+
+
