@@ -53,11 +53,11 @@ getSize = f . bounds
 idxToSquare arr (x, y) = ( ( fromIntegral x * w, fromIntegral y * h),
                          ( (fromIntegral x + 1) * w, (fromIntegral y + 1) * h ) )
   where
-    ( w, h )        = ( E.orthoW / fromIntegral n , E.orthoH / fromIntegral m )
+    ( w, h )        = ( (E.orthoW / fromIntegral n) , E.orthoH / fromIntegral m )
     ( n, m )        = ( getSize arr )
 
 instance E.Drawable Field where
-    draw field = mapM_ (E.draw . toRect) $ allIdx arr
+    draw field = (mapM_ (E.draw . toRect) $ allIdx arr)
       where arr             = getArr field
             allIdx          = range . bounds
             getTex (x, y)   = Just $ arr ! ( fromIntegral x, fromIntegral y )

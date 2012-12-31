@@ -16,7 +16,8 @@ module Game.RunMain (
     main
 ) where
 
-import Game.TowDef as TowDef
-import Game.Engine as Engine
+import qualified Game.TowDef as TowDef
+import qualified Game.Engine as E
 
-main = Engine.gameLoop TowDef.mainCor
+main = do
+  E.gameLoop TowDef.mainCor

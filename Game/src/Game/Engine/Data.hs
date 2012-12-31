@@ -45,10 +45,10 @@ instance Drawable a => Drawable [a] where
 -- MainCoroutine
 ----------------
 
-type MainCoroutine d = Coroutine (Input.Input, POSIXTime, Textures) [d]
+type MainCoroutine d = Coroutine (Input.Input, POSIXTime) [d]
 type MainCoroutineIO = MainCoroutine (IO ())
-type MainCoroutineID = Coroutine (Input.Input, POSIXTime, Textures)
-                                 (Input.Input, POSIXTime, Textures)
+type MainCoroutineID = Coroutine (Input.Input, POSIXTime)
+                                 (Input.Input, POSIXTime)
 
 mainCoroutineToIO :: Drawable d => MainCoroutine d -> MainCoroutineIO
 mainCoroutineToIO = fmap (map draw)

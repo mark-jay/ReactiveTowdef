@@ -44,38 +44,38 @@ import Game.TowDef.Field ( Field )
 -- tests
 --------
 
-mainCor :: E.MainCoroutineIO
-mainCor = E.mainCoroutineToIO main3 <++> bindings
+mainCor :: E.GlobConst -> E.MainCoroutineIO
+mainCor consts = E.mainCoroutineToIO (main3 (E.getTextures consts)) <++> bindings
 
 bindings :: E.MainCoroutineIO
 bindings = E.setHotkey (SpecialKey KeyF4) [E.Alt] (exitWith ExitSuccess)
       <++> E.setHotkey (Char '\27') [] (exitWith ExitSuccess)
-      <++> E.setHotkey (MouseButton LeftButton) [] (exitWith ExitSuccess)
 
-main1 :: E.MainCoroutine RectD
-main1 = arr $ (\(inp, _, _) -> [
+main1 :: E.Textures -> E.MainCoroutine RectD
+main1 _ = arr $ (\(inp, _) -> [
       let (Position x y) = fromMaybe (Position 0 0) $ E.getMousePos' inp
           v = fromIntegral (x `rem` 1000) / 1000.0
       in RectC ( 100, 100 ) ( 500, 500 ) ( Color3 v 0 0 )
       ])
 
-main2 :: E.MainCoroutineIO
-main2 = arr $ (\(inp, _, texts) -> [ do
+main2 :: E.Textures -> E.MainCoroutineIO
+main2 texts = arr $ (\(inp, _) -> [ do
       let (Position x y) = fromMaybe (Position 0 0) $ E.getMousePos' inp
           v = fromIntegral (x `rem` 1000) / 1000.0
 
       E.withTexture2d (Just $ snd $ texts !! 0) $ do
          E.draw $ RectT ( 500, 500 ) ( 700, 700 ) (Just $ snd $ texts !! 0)
 
-      E.draw $ RectC ( 100, 100 ) ( 500, 500 ) ( Color3 v 0 0 )
+      E.draw $ RectC ( 0, 0 ) ( 500, 500 ) ( Color3 v 0 0 )
+      E.draw $ RectC ( 500, 500 ) ( 1000, 1000 ) ( Color3 v 0 0 )
       ])
 
-fieldCor :: E.MainCoroutine Field
-fieldCor = arr (\(_,_,tex) -> tex) >>> arr mkField
-  where mkField texts = [Field.mkField 10 10 (cycle $ map snd texts)]
+fieldCor :: E.Textures -> E.MainCoroutineIO
+fieldCor texts = arr (const (Field.mkField 10 10 (cycle $ map snd texts)))
+        >>> arr (\f -> [E.draw f])
 
 fieldCor' :: E.Textures -> E.MainCoroutine Field
-fieldCor' texs = proc arg@(inp, _, _) -> do
+fieldCor' texs = proc arg@(inp, _) -> do
     posE      <- FRP.mapE E.getMousePos' <<<
                  E.hotKeyEvents (MouseButton LeftButton) [] -< arg
     idxsE     <- FRP.mapE (uncurry Field.mousePosToIdx) <<<
@@ -85,7 +85,7 @@ fieldCor' texs = proc arg@(inp, _, _) -> do
     returnA -< [field]
   where field = Field.mkField 10 10 (cycle $ map snd texs)
 
-main3 = fieldCor >>> arr (return . E.draw)
+main3 texts = fieldCor' texts
 
 -- drawing textures
 -------------------

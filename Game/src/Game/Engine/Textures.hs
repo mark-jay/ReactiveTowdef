@@ -31,7 +31,8 @@ type Textures = [(String, TextureObject)]
 
 nextTexture :: Textures -> TextureObject -> TextureObject
 nextTexture ts t = f $ elemIndex t ts'
-  where f (Just idx) = ts' !! (idx + 1 `rem` length ts')
+  where f (Just idx) = let idx'  = ((idx + 1) `rem` length ts')
+                       in (ts' !! idx')
         f Nothing    = error "nextTexture: texture object must be in the list"
         ts'          = map snd ts
 

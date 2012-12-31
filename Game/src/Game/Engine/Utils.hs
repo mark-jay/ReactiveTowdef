@@ -48,14 +48,14 @@ setHotkey :: Key -> [Mod] -> IO () -> MainCoroutineIO
 setHotkey key mods action = setHotkey' key mods $ const action
 
 setHotkey' :: Key -> [Mod]
-           -> ((Input.Input, POSIXTime, Textures) -> IO ())
+           -> ((Input.Input, POSIXTime) -> IO ())
            -> MainCoroutineIO
 setHotkey' key mods funAction = proc t -> do
   t' <- hotKeyEvents key mods -< t
   returnA -< map (const (funAction t)) t'
 
 hotKeyEvents :: Key -> [Mod] -> MainCoroutine Input
-hotKeyEvents key mods = proc arg@(inp,_,_) -> do
+hotKeyEvents key mods = proc arg@(inp,_) -> do
   events <- watch pressed <<< withPrevious' -< inp
   returnA -< map (const inp) events
     where

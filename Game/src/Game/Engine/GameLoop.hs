@@ -47,10 +47,11 @@ initWindowSize = Size 800 600
 -- entry point
 --------------
 
-gameLoop :: Drawable d => MainCoroutine d -> IO ()
+gameLoop :: Drawable d => (GS.GlobConst -> MainCoroutine d) -> IO ()
 gameLoop coroutine = do
   getArgsAndInitialize >> createWindow "Game"
-  state <- GS.initGlobState (mainCoroutineToIO coroutine)
+  consts <- GS.initGlobConst
+  state <- GS.initGlobState (mainCoroutineToIO (coroutine consts))
 
   let inpRef = GS.getKB state
       redraw = renderViewport (swapBuffers >> postRedisplay Nothing) state
@@ -68,7 +69,9 @@ gameLoop coroutine = do
   reshapeCallback        $= Just shapeCallback
   displayCallback        $= redraw
 
-  squareReshape initWindowSize
+  ortho 0 orthoW orthoH 0 (-1) 1
+  reshape initWindowSize
+  
 
   initialWindowSize  $= initWindowSize
   initialDisplayMode $= [DoubleBuffered] -- now display callback will be called more often
@@ -78,7 +81,7 @@ gameLoop coroutine = do
 ------------
 
 renderViewport redisplayFn state = do
-  (kb, prev, c, textures) <- GS.unpack state
+  (kb, prev, c) <- GS.unpack state
   current <- getPOSIXTime
 
   let delta  = (current - prev)
@@ -86,7 +89,7 @@ renderViewport redisplayFn state = do
   if delta < secPerTick
       then return ()
       else do
-        let (r', c') = runC c (kb, current, textures)
+        let (r', c') = runC c (kb, current)
         case c' of
             Just c' -> do
                 writeIORef (GS.getCoroutine state) c'
