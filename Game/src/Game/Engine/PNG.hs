@@ -1,6 +1,9 @@
 {- PNG.hs; Garrett Bluma (gb@garrettbluma.com) 2012 -}
 
-module Game.Engine.PNG where
+module Game.Engine.PNG
+  ( readPng
+  , getPixelData
+  ) where
 
 import Codec.Image.PNG
 import Data.Array.Storable

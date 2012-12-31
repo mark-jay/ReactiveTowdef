@@ -12,13 +12,13 @@
 --
 -----------------------------------------------------------------------------
 
-module Game.Engine.Data (
-    Drawable(..)
+module Game.Engine.Data
+  ( Drawable(..)
   , MainCoroutine
   , MainCoroutineIO
   , MainCoroutineID
   , mainCoroutineToIO
-) where
+  ) where
 
 import Graphics.UI.GLUT ( TextureObject )
 

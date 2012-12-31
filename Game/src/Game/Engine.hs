@@ -12,14 +12,14 @@
 --
 -----------------------------------------------------------------------------
 
-module Game.Engine (
-  module Game.Engine.GameLoop
+module Game.Engine 
+  ( module Game.Engine.GameLoop
   , module Game.Engine.GlobState
   , module Game.Engine.Input
   , module Game.Engine.Utils
   , module Game.Engine.Data
   , module Game.Engine.Textures
-) where
+  ) where
 
 import Game.Engine.GameLoop
 import Game.Engine.GlobState

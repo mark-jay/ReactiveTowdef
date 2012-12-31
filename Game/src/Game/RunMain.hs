@@ -12,9 +12,9 @@
 --
 -----------------------------------------------------------------------------
 
-module Game.RunMain (
-    main
-) where
+module Game.RunMain
+  ( main
+  ) where
 
 import qualified Game.TowDef as TowDef
 import qualified Game.Engine as E

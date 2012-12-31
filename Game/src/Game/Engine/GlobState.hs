@@ -12,14 +12,14 @@
 --
 -----------------------------------------------------------------------------
 
-module Game.Engine.GlobState (
-    GlobState(..)
+module Game.Engine.GlobState
+  ( GlobState(..)
   , initGlobState
   , unpack
   , MainCoroutineIO
   , GlobConst(getTextures)
   , initGlobConst
-) where
+  ) where
 
 import Data.IORef
 import Data.Time.Clock.POSIX

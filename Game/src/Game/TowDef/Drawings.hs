@@ -12,10 +12,10 @@
 --
 -----------------------------------------------------------------------------
 
-module Game.TowDef.Drawings (
-    drawRect
+module Game.TowDef.Drawings
+  ( drawRect
   , RectD(..)
-) where
+  ) where
 
 import Graphics.Rendering.OpenGL
 

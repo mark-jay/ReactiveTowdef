@@ -12,11 +12,11 @@
 --
 -----------------------------------------------------------------------------
 
-module Game.Engine.GameLoop (
-    gameLoop
+module Game.Engine.GameLoop
+  ( gameLoop
   , orthoH
   , orthoW
-) where
+  ) where
 
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT

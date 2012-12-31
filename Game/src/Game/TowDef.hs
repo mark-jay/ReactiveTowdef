@@ -12,9 +12,9 @@
 --
 -----------------------------------------------------------------------------
 {-# LANGUAGE Arrows #-}
-module Game.TowDef (
-  mainCor
-) where
+module Game.TowDef
+  ( mainCor
+  ) where
 
 
 import Graphics.Rendering.OpenGL

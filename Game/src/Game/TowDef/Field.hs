@@ -12,13 +12,13 @@
 --
 -----------------------------------------------------------------------------
 
-module Game.TowDef.Field (
-    mkSimpleField
+module Game.TowDef.Field
+  ( mkSimpleField
   , mkField
   , mousePosToIdx
   , mapTextureAt
   , Field(..)
-) where
+  ) where
 
 import Graphics.UI.GLUT ( TextureObject )
 import qualified Graphics.UI.GLUT as GLUT

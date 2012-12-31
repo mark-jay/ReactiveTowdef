@@ -12,12 +12,12 @@
 --
 -----------------------------------------------------------------------------
 {-# LANGUAGE Arrows #-}
-module Game.Engine.Utils (
-    setHotkey
+module Game.Engine.Utils
+  ( setHotkey
   , setHotkey'
   , hotKeyEvents
   , withTexture2d
-) where
+  ) where
 
 import Graphics.UI.GLUT
 

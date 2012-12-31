@@ -8,11 +8,11 @@ This module is for loading textures
 
 -}
 
-module Game.Engine.Textures (
-    Textures
+module Game.Engine.Textures
+  ( Textures
   , getAndCreateTexturesAll
   , nextTexture
-) where
+  ) where
 
 import Graphics.Rendering.OpenGL
 import Game.Engine.PNG (readPng)
