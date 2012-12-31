@@ -16,6 +16,7 @@ module Game.Engine.Data (
     Drawable(..)
   , MainCoroutine
   , MainCoroutineIO
+  , MainCoroutineID
   , mainCoroutineToIO
 ) where
 
@@ -46,6 +47,8 @@ instance Drawable a => Drawable [a] where
 
 type MainCoroutine d = Coroutine (Input.Input, POSIXTime, Textures) [d]
 type MainCoroutineIO = MainCoroutine (IO ())
+type MainCoroutineID = Coroutine (Input.Input, POSIXTime, Textures)
+                                 (Input.Input, POSIXTime, Textures)
 
 mainCoroutineToIO :: Drawable d => MainCoroutine d -> MainCoroutineIO
 mainCoroutineToIO = fmap (map draw)

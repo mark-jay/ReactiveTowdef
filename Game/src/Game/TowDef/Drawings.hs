@@ -26,7 +26,7 @@ import qualified Game.Engine as E
 type Line = (Point, Point, ColorT)
 type ColorT = Color3 GLfloat
 type Point = (Coord, Coord)
-type Coord = GLfloat
+type Coord = GLdouble
 
 drawLines :: [Line] -> IO ()
 drawLines = mapM_ drawLine
@@ -44,16 +44,17 @@ drawVertex (x, y) = vertex $ Vertex3 x y 0
 -- D for drawable
 data RectD = RectC Point Point ColorT
            | RectT Point Point (Maybe TextureObject)
+           deriving ( Show )
 
 instance E.Drawable RectD where
   draw (RectC (x1, y1) (x2, y2) aColor) = renderPrimitive Quads actions
     where actions = color aColor >>
                     drawVertex (x1, y1) >> drawVertex (x2, y1) >>
                     drawVertex (x2, y2) >> drawVertex (x1, y2)
-  draw (RectT (x1, y1) (x2, y2) texObj) = renderPrimitive Quads actions
-    where actions = E.withTexture2d texObj $ do
+  draw (RectT (x1, y1) (x2, y2) texObj) = E.withTexture2d texObj $
+                                          renderPrimitive Quads actions
+    where actions = do
              let texCoord2f = texCoord :: TexCoord2 GLfloat -> IO ()
-             color ( Color3 1 1 ( 1 :: GLfloat ) )
              texCoord2f (TexCoord2 0 0) >> drawVertex (x1, y1)
              texCoord2f (TexCoord2 0 1) >> drawVertex (x1, y2)
              texCoord2f (TexCoord2 1 1) >> drawVertex (x2, y2)

@@ -14,6 +14,8 @@
 
 module Game.Engine.GameLoop (
     gameLoop
+  , orthoH
+  , orthoW
 ) where
 
 import Graphics.Rendering.OpenGL

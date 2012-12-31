@@ -59,6 +59,9 @@ filterE = arr . filter
 zipE :: Coroutine (Event e, Event e) (Event e)
 zipE = zipWithC (++)
 
+zipE' :: Coroutine (Event e, Event e') (Event (e, e'))
+zipE' = arr $ uncurry zip
+
 mergeE :: Coroutine i (Event e) -> Coroutine i (Event e) -> Coroutine i (Event e)
 mergeE = (<++>)
 

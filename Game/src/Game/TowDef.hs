@@ -11,7 +11,7 @@
 -- |
 --
 -----------------------------------------------------------------------------
-
+{-# LANGUAGE Arrows #-}
 module Game.TowDef (
   mainCor
 ) where
@@ -38,16 +38,19 @@ import Data.Array.Storable
 import Codec.Image.PNG
 
 import Game.TowDef.Drawings ( drawRect, RectD(..) )
+import qualified Game.TowDef.Field as Field
+import Game.TowDef.Field ( Field )
 
 -- tests
 --------
 
 mainCor :: E.MainCoroutineIO
-mainCor = E.mainCoroutineToIO main2 <++> bindings
+mainCor = E.mainCoroutineToIO main3 <++> bindings
 
 bindings :: E.MainCoroutineIO
 bindings = E.setHotkey (SpecialKey KeyF4) [E.Alt] (exitWith ExitSuccess)
       <++> E.setHotkey (Char '\27') [] (exitWith ExitSuccess)
+      <++> E.setHotkey (MouseButton LeftButton) [] (exitWith ExitSuccess)
 
 main1 :: E.MainCoroutine RectD
 main1 = arr $ (\(inp, _, _) -> [
@@ -67,11 +70,22 @@ main2 = arr $ (\(inp, _, texts) -> [ do
       E.draw $ RectC ( 100, 100 ) ( 500, 500 ) ( Color3 v 0 0 )
       ])
 
+fieldCor :: E.MainCoroutine Field
+fieldCor = arr (\(_,_,tex) -> tex) >>> arr mkField
+  where mkField texts = [Field.mkField 10 10 (cycle $ map snd texts)]
+
+fieldCor' :: E.Textures -> E.MainCoroutine Field
+fieldCor' texs = proc arg@(inp, _, _) -> do
+    posE      <- FRP.mapE E.getMousePos' <<<
+                 E.hotKeyEvents (MouseButton LeftButton) [] -< arg
+    idxsE     <- FRP.mapE (uncurry Field.mousePosToIdx) <<<
+                 arr (uncurry zip . second Maybe.catMaybes) -< ([field], posE)
+    field     <- FRP.scanE (flip (flip Field.mapTextureAt (E.nextTexture texs)))
+                           field -< idxsE :: FRP.Event (Int, Int)
+    returnA -< [field]
+  where field = Field.mkField 10 10 (cycle $ map snd texs)
+
+main3 = fieldCor >>> arr (return . E.draw)
+
 -- drawing textures
 -------------------
-
-reminder = loadPNGFile "file" >>= f
-  where f (Left error)     = return ()
-        f (Right pngImage) = g $ imageData pngImage
-        g storArr = withStorableArray storArr (\ptr -> return ())
-
